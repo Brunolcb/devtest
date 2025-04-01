@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     vim \
+ && bash: sqlite3: command not found \
  && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry using the official installation script
@@ -28,5 +29,5 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Default command: open a bash shell with Poetry activated.
-CMD ["poetry", "run", "bash"]
+CMD ["poetry", "run", "bash", "uvicorn", "sqlite3"]
 

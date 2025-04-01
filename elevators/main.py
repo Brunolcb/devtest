@@ -25,7 +25,7 @@ class State(Base):
         vacant (bool): Indicates if the elevator is vacant.
         mooving (bool): Indicates if the elevator is moving.
     """
-    __tablename__ = "state"
+    __tablename__ = "states"
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     current_floor = Column(Integer, nullable=False)
     state_time = Column(DateTime, default=datetime.utcnow)
@@ -40,7 +40,7 @@ class Demand(Base):
         demand_floor (int): The floor from which the demand is made.
         demand_time (datetime): The time when the demand was recorded.
     """
-    __tablename__ = "demand"
+    __tablename__ = "demands"
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     demand_floor = Column(Integer, nullable=False)
     demand_time = Column(DateTime, default=datetime.utcnow)
@@ -56,8 +56,8 @@ class StateBase(BaseModel):
     mooving: bool
 
 class DemandBase(BaseModel):
-    demand_floor = int
-    demand_time = datetime
+    demand_floor : int
+    demand_time : datetime
 
 
 
