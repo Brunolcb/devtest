@@ -21,8 +21,12 @@ sqlite3 elevators.db < database_schema.sql
 ```sh
 uvicorn main:app
 ```
-
 The application will be available at ``http://127.0.0.1:8000/docs``
+
+### Also you can test the unit tests, run (remember that you need to be inside the elevators folder):
+```sh
+pytest test.py -v
+```
 
 # Dev Test
 
