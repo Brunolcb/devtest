@@ -1,3 +1,30 @@
+# Solution 
+First, you will need to install VS Code and DevContainers. Assuming you have already installed VS Code, search for the DevContainers extension.
+
+![alt text](dev_containers_install.png)
+
+After that, open the repository in VS Code and click on the blue button at the bottom left.
+
+![alt text](dev_containers.png)
+
+Finally, search for "Reopen Container" or "Rebuild Container".
+
+![alt text](dev_containers_2.png)
+
+### If you want to create your own database, first delete the existing database elevators.db , then run:
+```sh
+cd elevators
+sqlite3 elevators.db < database_schema.sql
+```
+
+### In the elevators folder, run the app:
+```sh
+uvicorn main:app
+```
+
+The application will be available at ``http://127.0.0.1:8000/docs``
+
+
 # Dev Test
 
 ## Elevators
