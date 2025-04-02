@@ -24,7 +24,6 @@ uvicorn main:app
 
 The application will be available at ``http://127.0.0.1:8000/docs``
 
-
 # Dev Test
 
 ## Elevators
