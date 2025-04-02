@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     vim \
- && bash: sqlite3: command not found \
+ && apt-get install sqlite3 \
  && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry using the official installation script

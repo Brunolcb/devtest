@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Boolean, Integer, DateTime
+from sqlalchemy import create_engine, Column, Boolean, Integer, DateTime, literal
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 
@@ -60,9 +60,7 @@ class DemandBase(BaseModel):
     demand_time : datetime
 
 
-
 #Dependency or Data Base Session
-
 def get_db():
     db = SessionLocal()
     try:
@@ -153,27 +151,32 @@ def get_dataset(db: Session = Depends(get_db)):
         db (Session): The database session dependency.     
     Returns:
         List[dict]: A list of records where each record contains:
-            - resting_floor (int): The elevator's resting floor from the state record.
-            - resting_time (datetime): The time when the elevator was in the resting state.
-            - demand_floor (int): The floor requested in the demand.
-            - demand_time (datetime): The time when the demand was recorded.
+            - event_type_is_resting (bool): True if the event is a resting state, False if it is a demand.
+            - floor (int): The elevator floor associated with the event.
+            - time (datetime): The timestamp of the event.
     """
-    dataset = []
-    # Retrieve all demand records ordered by demand_time
-    demands = db.query(Demand).order_by(Demand.demand_time).all()
-    for demand in demands:
-        # For each demand, find the most recent state record where the elevator was resting.
-        resting_state = db.query(State).filter(
-            State.state_time <= demand.demand_time,
-            State.vacant == True,
-            State.mooving == False
-        ).order_by(State.state_time.desc()).first()
-        if resting_state:
-            record = {
-                "resting_floor": resting_state.current_floor,
-                "resting_time": resting_state.state_time,
-                "demand_floor": demand.demand_floor,
-                "demand_time": demand.demand_time,
-            }
-            dataset.append(record)
+    # Query resting states as events
+    resting_query = db.query(
+        literal(True).label("event_type_is_resting"),
+        State.current_floor.label("floor"),
+        State.state_time.label("time")
+    ).filter(
+        State.vacant == True,
+        State.mooving == False
+    )
+    
+    # Query demand events
+    demand_query = db.query(
+        literal(False).label("event_type_is_resting"),
+        Demand.demand_floor.label("floor"),
+        Demand.demand_time.label("time")
+    )
+    
+    # Combine the queries using union_all and order by the event time.
+    union_query = resting_query.union_all(demand_query).order_by("time")
+    
+    results = union_query.all()
+    
+    # Convert SQLAlchemy row objects to dictionaries.
+    dataset = [{"event_type_is_resting": row.event_type_is_resting, "floor": row.floor, "time": row.time} for row in results]
     return dataset
